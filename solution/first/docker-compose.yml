@@ -1,0 +1,26 @@
+version: '3.2'
+services:
+  reverse_proxy:
+    image: reverseproxy
+    container_name: reverseproxy
+    ports:
+    - 80:80
+    - 443:443
+  random_num_app:
+    image: rundomnum
+    container_name: rundomnum
+    ports:
+    - 5000:5000
+    depends_on:
+    - reverse_proxy
+  cadvisor:
+    image: gcr.io/cadvisor/cadvisor:latest
+    container_name: cadvisor
+    ports:
+    - 8080:8080
+    volumes:
+    - /:/rootfs:ro
+    - /var/run:/var/run:rw
+    - /sys:/sys:ro
+    - /var/lib/docker/:/var/lib/docker:ro
+
