@@ -1,0 +1,107 @@
+---
+- hosts: '{{ target }}'
+  become: yes
+  become_user: root
+  tasks:
+          # - name: Remove previous installation for Docker then update apt-get cache
+          #   apt:
+          #     name: '{{ app }}'
+          #      state: absent
+          #    vars:
+          #      app:
+          #      - docker-engine
+          #      - docker
+          #      - docker.io
+          #      - containerd
+          #      - runc
+          #  - name: install preq
+          #    apt:
+          #      name: '{{ app2 }}'
+          #      state: present
+          #    vars:
+          #      app2:
+          #        - apt-transport-https
+          #        - ca-certificates
+          #        - curl
+          #        - gnupg-agent
+          #        - software-properties-common
+  - name: Install Docker Certificate
+    apt_key:
+      url: https://download.docker.com/linux/ubuntu/gpg
+      state: present
+  - name: Adding Docker Reprository
+    apt_repository:
+      repo: "deb https://download.docker.com/linux/ubuntu bionic stable"
+      state: present
+      update_cache: true
+  - name: Start Docker Installtion
+    apt:
+      name: '{{ app3 }}'
+      state: present
+    vars:
+      app3:
+        - docker-ce
+        - docker-ce-cli
+        - containerd.io
+  - name: Install Kubernetes Certificate
+    apt_key:
+      url: https://packages.cloud.google.com/apt/doc/apt-key.gpg
+      state: present
+  - name: apt update
+    shell: |
+      apt update 
+  - name: Adding Kubernetes Reprository
+    apt_repository:
+      repo: "deb https://apt.kubernetes.io/ kubernetes-xenial main"
+      state: present
+      update_cache: true
+
+  - name: Start Kubernetes Components Installation - installing kubeadm , kublet and kubectl
+    apt:
+      name: '{{ app4 }}'
+      state: present
+
+    vars:
+      app4:
+        - kubelet
+        - kubeadm 
+        - kubectl
+  - name: Initializing Kubernetes cluster with kubeadm and set pod network CIDR
+    shell: kubeadm init --pod-network-cidr=192.168.0.0/16 --ignore-preflight-errors=All
+
+  - name: wait for 20 seconds
+    wait_for:
+      timeout: 20
+
+  - name: Configuring Kubectl 
+    shell: |
+      mkdir -p $HOME/.kube 
+      cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+      chown $(id -u):$(id -g) $HOME/.kube/config
+  - name: Remove taint from master to schedule pods on it
+    shell: |
+      kubectl taint nodes --all node-role.kubernetes.io/master-
+
+  - name: Installing Calico CNI
+    shell: |
+      kubectl create -f https://docs.projectcalico.org/manifests/tigera-operator.yaml
+
+
+  - name: wait for 20 seconds
+    wait_for:
+      timeout: 20
+
+  - name: proceeding with Calico installation 
+    shell: |
+     kubectl create -f https://docs.projectcalico.org/manifests/custom-resources.yaml
+
+  - name: wait for 20 seconds
+    wait_for:
+      timeout: 20
+
+  - name: Wait for pods to be in Running state
+    shell: kubectl get pods -n calico-system -o json
+    register: pods_status_result
+    until: pods_status_result.stdout|from_json|json_query('items[*].status.phase')|unique == ["Running"]
+    retries: 10
+    delay: 5

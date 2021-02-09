@@ -1,0 +1,27 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: randomsvc
+spec:
+  selector:
+    app: random
+  type: ClusterIP
+  ports:
+    - port: 5000
+      targetPort: 5000
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: rproxysvc
+spec:
+  selector:
+    app: rproxy
+  type: ClusterIP
+  ports:
+    - name: http
+      port: 80
+      targetPort: 80
+    - name: https
+      port: 443
+      targetPort: 443
