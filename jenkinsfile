@@ -1,10 +1,19 @@
 node {  
+    agnet any
+    // tools {
+
+    // }
     stage("Build") { 
         steps{
           echo 'building the application '
         }
     }
     stage("Test") { 
+      when {
+        expression{
+          
+        }
+      }
         steps{
           echo 'Testing the application '
         } 
@@ -18,7 +27,7 @@ node {
     
     always {
     //send email 
-    docker-compose down
+    //docker-compose down
     }
     
     
