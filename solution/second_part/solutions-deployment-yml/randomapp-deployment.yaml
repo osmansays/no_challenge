@@ -1,21 +1,26 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: random-app-deployment
+  name: random-solution-deployment
   labels:
-    app: random
+    app: random-solution
 spec:
   replicas: 4
   selector:
     matchLabels:
-      app: random
+      app: random-solution
   template:
     metadata:
       labels:
-        app: random
+        app: random-solution
     spec:
       containers:
       - name: random
         image: osmansays/random
         ports:
         - containerPort: 5000
+      - name: rproxy
+        image: osmansays/rproxy
+        ports:
+        - containerPort: 80
+        - containerPort: 443
