@@ -14,4 +14,22 @@ node {
           echo 'Deploying the application '
         } 
     }
+    posts{
+    
+    always {
+    //send email 
+    docker-compose down
+    }
+    
+    
+    success {
+    //when sucess 
+    }
+    
+    
+    failure {
+    //when failed
+    }
+    
+    }
 }
