@@ -17,6 +17,8 @@ spec:
       containers:
       - name: random
         image: osmansays/random
+        ports:
+        - containerPort: 5000
       - name: rproxy
         image: osmansays/rproxy
         ports:
