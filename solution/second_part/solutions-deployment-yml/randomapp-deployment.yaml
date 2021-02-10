@@ -19,7 +19,7 @@ spec:
         image: osmansays/random
         ports:
         - containerPort: 5000
-      - name: rproxy
+      - name: proxy
         image: osmansays/rproxy
         ports:
         - containerPort: 80

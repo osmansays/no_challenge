@@ -1,18 +1,18 @@
 version: '3.2'
 services:
-  rproxysvc:
+  rproxy:
     image: osmansays/rproxy
     container_name: rproxy
     ports:
     - 80:80
     - 443:443
-  randomsvc:
+  random:
     image: osmansays/random
     container_name: random
     ports:
     - 5000:5000
     depends_on:
-    - rproxysvc
+    - rproxy
 #  cadvisorsvc:
 #    image: gcr.io/cadvisor/cadvisor:latest
 #    container_name: cadvisor
