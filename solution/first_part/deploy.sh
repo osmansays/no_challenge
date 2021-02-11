@@ -1,6 +1,6 @@
 #!/bin/sh
-docker build ../app/ -t osmansays/random:latest
-docker push osmansays/random:latest
-docker build ../reverseproxy/ -t osmansays/rproxy:lates
-docker push osmansays/rproxy:latest
-VER=latest docker-compose up -d
+docker build ../app/ -t osmansays/random:test
+docker push osmansays/random:test
+docker build ../reverseproxy/ -t osmansays/rproxy:test
+docker push osmansays/rproxy:test
+VER=test docker-compose up -d
