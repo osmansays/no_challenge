@@ -2,17 +2,17 @@ version: '3.2'
 services:
   rproxy:
     environment:{server_name}
-    image: osmansays/rproxy:{VERSION}
+    image: 'osmansays/rproxy:{VER}'
     container_name: rproxy
     ports:
     - 80:80
     - 443:443
   random:
-    image: osmansays/random:{VERSION}
+    image: 'osmansays/random:{VER}'
     container_name: random
     ports:
     - 5000:5000
-    depends_on:
+    depends_on: 
     - rproxy
 #  cadvisorsvc:
 #    image: gcr.io/cadvisor/cadvisor:latest
