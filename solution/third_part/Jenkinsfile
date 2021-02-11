@@ -43,7 +43,7 @@ pipeline{
                 echo 'Running docker-compose down to turn off testing enviroment'
                 dir("solution/first_part/") 
                     {
-                    sh "docker-compose down"
+                    sh "VER=${BUILD_NUMBER} docker-compose down"
                     }
             }
         }
@@ -54,35 +54,24 @@ pipeline{
                 echo 'deploying the applications on Kubernetes cluster using Kubectl'
                 dir("solution/second_part/solutions-deployment-yml") 
                     {
-                    sh 'kubectl apply -f .'
+                    sh 'kubectl set image deployment/random-solution-deployment random=osmansays/random:${BUILD_NUMBER} rproxy=osmansays/rproxy:${BUILD_NUMBER} --record'
                     }
             }
         }
         
-        stage('Check deployment status '){
+        stage('Check deployment status and rollback if failed'){
             steps{
             sh '''
-             uptodate_count=$(kubectl get deployments | grep random-solution-deployment | awk '{print $4}')
-              if [ $uptodate_count -ge 2 ]; then
-                     echo 'Deployment Working Correctly and pods are running as expected.. at least 2 pods are running out of 3'
-                     exit 0
-              else
-              echo 'Pods failed to operate as expected , rolling back to older version'
-              kubectl 
-              exit 1
-              fi
+                sleep 900 && \
+                if [[ $(timeout 5 kubectl rollout status -f <deployment_file>.yaml) != *"successfully rolled out"* ]]; then     
+                    kubectl rollout undo -f <deployment_file>.yaml
+                    echo "Issue with latest deployment then rolled back to previous version"
+                fi > /dev/null 2>&1 &
 
             '''
             }
         }
-      
-        stage('Anchore analyse') {  
-    steps {  
-     writeFile file: 'anchore_images', text: 'osmansays/random'  
-     anchore name: 'anchore_images'  
-    }  
-    
+
         
-        }
     }
 }
