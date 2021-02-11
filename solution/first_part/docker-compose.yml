@@ -1,6 +1,7 @@
 version: '3.2'
 services:
   rproxy:
+    environment:{server_name}
     image: osmansays/rproxy
     container_name: rproxy
     ports:
