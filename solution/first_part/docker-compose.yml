@@ -1,13 +1,13 @@
 version: '3.2'
 services:
   rproxy:
-    image: 'osmansays/rproxy:{VER}'
+    image: 'osmansays/rproxy:${VER}'
     container_name: rproxy
     ports:
     - 80:80
     - 443:443
   random:
-    image: 'osmansays/random:{VER}'
+    image: 'osmansays/random:${VER}'
     container_name: random
     ports:
     - 5000:5000
